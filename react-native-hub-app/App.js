@@ -5,13 +5,17 @@
 
 import React from 'react';
 import {StyleSheet, View, StatusBar} from 'react-native';
-import CheckList from './src/checklist';
+import { Header, Text } from 'native-base';
+
+import Login from './src/Login';
 
 const App: () => React$Node = () => {
   return (
     <View style={styles.container}>
-      <StatusBar />
-      <CheckList />
+      <Header>
+        <Text>Mobility</Text>
+      </Header>
+      <Login />
     </View>
   );
 };
@@ -19,10 +23,6 @@ const App: () => React$Node = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 8,
-    flexDirection: 'column', // main axis
-    justifyContent: 'center', // main axis
-    alignItems: 'center', // cross axis
     backgroundColor: '#FEFEFE',
   },
 });

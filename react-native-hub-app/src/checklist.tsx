@@ -1,4 +1,4 @@
-/**
+ /**
  * Sample React Native App
  * https://github.com/facebook/react-native
  *
@@ -52,8 +52,6 @@ class CheckList extends React.Component<StateProps> {
       { key: 'Step 1', name: 'Setup ThreadDB', status: 0 },
       { key: 'Step 2', name: 'Add Instance to Collection', status: 0 },
       { key: 'Step 3', name: 'Query from our Collection', status: 0 },
-      { key: 'Step 4', name: 'Create a webpage', status: 0 },
-      { key: 'Step 5', name: 'Push webpage to User Bucket', status: 0 },
     ],
     step: 0,
     errorMessage: '',
@@ -243,7 +241,7 @@ class CheckList extends React.Component<StateProps> {
           const identity = await generateIdentity()
           const buckets = await Buckets.withKeyInfo(info)
           await buckets.getToken(identity)
-          
+
           const root = await buckets.open('files')
           if (!root) {
             throw new Error('Error opening bucket')
