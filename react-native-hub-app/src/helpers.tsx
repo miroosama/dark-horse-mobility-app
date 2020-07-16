@@ -5,9 +5,14 @@ import { Libp2pCryptoIdentity } from '@textile/threads-core'
 const version = 10038 //Math.floor(Math.random() * 1000);
 const IDENTITY_KEY = 'identity-' + version
 const USER_THREAD_ID = 'user-thread-' + version
+const TRIP_THREAD_ID = 'user-thread-' + version
 
 export const cacheUserThread = async (id: ThreadID) => {
   await AsyncStorage.setItem(USER_THREAD_ID, id.toString())
+}
+
+export const cacheTripThread = async (id: ThreadID) => {
+  await AsyncStorage.setItem(TRIP_THREAD_ID, id.toString())
 }
 
 export const getCachedUserThread = async (): Promise<ThreadID | undefined> => {
@@ -24,6 +29,15 @@ export const getCachedUserThread = async (): Promise<ThreadID | undefined> => {
     /**
      * Temporary hack to get ThreadID working in RN
      */
+    const id: ThreadID = ThreadID.fromString(idStr)
+    return id
+  }
+  return undefined
+}
+
+export const getCachedTripThread = async (): Promise<ThreadID | undefined> => {
+  const idStr = await AsyncStorage.getItem(TRIP_THREAD_ID)
+  if (idStr) {
     const id: ThreadID = ThreadID.fromString(idStr)
     return id
   }
