@@ -91,3 +91,33 @@ export const userSchema = {
     },
   },
 }
+
+export const tripSchema = {
+  $id: 'https://example.com/astronaut.schema.json',
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  title: 'Trips',
+  type: 'object',
+  required: ['_id'],
+  properties: {
+    _id: {
+      type: 'string',
+      description: "The instance's id.",
+    },
+    userEthAddress: {
+      type: 'string',
+      description: "User's Eth Account",
+    },
+    userId: {
+      type: 'string',
+      description: "Textile identity",
+    },
+    coordinates: {
+      type: 'array',
+      description: "Coordinates of trip",
+    },
+    timestamps: {
+      type: 'array',
+      description: 'Timestamps for coordinates',
+    },
+  },
+}

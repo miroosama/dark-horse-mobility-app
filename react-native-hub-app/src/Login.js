@@ -34,9 +34,7 @@ export default function Login() {
     try {
       const idArr = await generateIdentity();
       const id = idArr[0];
-      console.log(id)
       const identity = id.toString();
-      console.log(identity)
       const info = {
         key: USER_API_KEY,
         secret: USER_API_SECRET
@@ -45,7 +43,6 @@ export default function Login() {
       userDb = await Client.withKeyInfo(info);
 
       await userDb.getToken(id);
-      console.log(idArr[1])
       if (idArr[1]) {
         setDb(userDb)
         setIdentity(identity);
@@ -69,7 +66,7 @@ export default function Login() {
 
   const createUser = async () => {
       const ids = await db.create(threadId, 'User', [{
-        id: '',
+        _id: '',
         userAddress: identity,
         username,
         socialHandle,
@@ -125,7 +122,7 @@ export default function Login() {
       }
       {
         createdUser
-        ? <Trips db={db}/>
+        ? <Trips db={db} identity={identity}/>
         : null
       }
     </Container>
