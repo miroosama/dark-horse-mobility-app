@@ -17,9 +17,11 @@
     "@textile/hub": "^0.3.3",
     "@textile/threads-core": "0.1.30",
     "bad-words": "^3.0.3",
+    "base-64": "^0.1.0",
     "buffer": "^4.9.2",
     "events": "^3.1.0",
     "native-base": "^2.13.12",
+    "node-libs-browser": "^2.2.1",
     "path-browserify": "0.0.0",
     "process": "^0.11.10",
     "react": "16.11.0",
@@ -30,10 +32,10 @@
     "react-native-level-fs": "^3.0.1",
     "react-native-randombytes": "^3.5.3",
     "readable-stream": "^1.1.14",
-    "rn-nodeify": "^10.2.0",
     "stream": "0.0.2",
     "stream-browserify": "^1.0.0",
-    "vm-browserify": "0.0.4"
+    "vm-browserify": "0.0.4",
+    "web3": "^1.2.11"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
@@ -43,13 +45,16 @@
     "@types/react-native": "^0.62.8",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
+    "babel-cli": "^6.26.0",
     "babel-jest": "^26.0.1",
+    "babel-preset-es2015": "^6.24.1",
     "eslint": "^7.0.0",
     "eslint-import-resolver-typescript": "^2.0.0",
     "jest": "^26.0.1",
     "metro-react-native-babel-preset": "^0.59.0",
     "npm-check-updates": "^6.0.1",
     "react-test-renderer": "16.11.0",
+    "rn-nodeify": "^10.2.0",
     "typescript": "^3.9.2"
   },
   "jest": {
