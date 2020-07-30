@@ -2,17 +2,17 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { ThreadID } from '@textile/hub'
 import { Libp2pCryptoIdentity } from '@textile/threads-core'
 
-const version = 10038 //Math.floor(Math.random() * 1000);
+const version = 500009 //Math.floor(Math.random() * 1000);
 const IDENTITY_KEY = 'identity-' + version
-const USER_THREAD_ID = 'user-thread-' + version
-const TRIP_THREAD_ID = 'user-thread-' + version
+const USER_THREAD_ID_V = 'user-thread-' + version
+const TRIP_THREAD_ID_V = 'user-thread-' + version
 
 export const cacheUserThread = async (id: ThreadID) => {
-  await AsyncStorage.setItem(USER_THREAD_ID, id.toString())
+  await AsyncStorage.setItem(USER_THREAD_ID_V, id.toString())
 }
 
 export const cacheTripThread = async (id: ThreadID) => {
-  await AsyncStorage.setItem(TRIP_THREAD_ID, id.toString())
+  await AsyncStorage.setItem(TRIP_THREAD_ID_V, id.toString())
 }
 
 export const getCachedUserThread = async (): Promise<ThreadID | undefined> => {
@@ -22,9 +22,10 @@ export const getCachedUserThread = async (): Promise<ThreadID | undefined> => {
    * If the identity changes and you try to use an old database,
    * it will error due to not authorized.
    */
-  const idStr = await AsyncStorage.getItem(USER_THREAD_ID)
+   console.log(USER_THREAD_ID_V)
+  const idStr = await AsyncStorage.getItem(USER_THREAD_ID_V)
   // Every user adds their info to same user thread
-
+  console.log(idStr)
   if (idStr) {
     /**
      * Temporary hack to get ThreadID working in RN
@@ -36,7 +37,7 @@ export const getCachedUserThread = async (): Promise<ThreadID | undefined> => {
 }
 
 export const getCachedTripThread = async (): Promise<ThreadID | undefined> => {
-  const idStr = await AsyncStorage.getItem(TRIP_THREAD_ID)
+  const idStr = await AsyncStorage.getItem(TRIP_THREAD_ID_V)
   if (idStr) {
     const id: ThreadID = ThreadID.fromString(idStr)
     return id
@@ -48,12 +49,12 @@ export const generateIdentity = async (): Promise<Libp2pCryptoIdentity> => {
   let idStr = await AsyncStorage.getItem(IDENTITY_KEY)
   if (idStr) {
     const cachedId = await Libp2pCryptoIdentity.fromString(idStr)
-    return [cachedId, true]
+    return cachedId
   } else {
     const id = await Libp2pCryptoIdentity.fromRandom()
     idStr = id.toString()
     await AsyncStorage.setItem(IDENTITY_KEY, idStr)
-    return [id, false]
+    return id
   }
 }
 
@@ -70,7 +71,7 @@ export const userSchema = {
     },
     userAddress: {
       type: 'string',
-      description: "User's Identity",
+      description: "User's Ethereum Address",
     },
     username: {
       type: 'string',
@@ -88,6 +89,14 @@ export const userSchema = {
     occupancy: {
       type: 'string',
       description: "User's occupancy",
+    },
+    adRewards: {
+      type: 'boolean',
+      description: "User opt in for add reward",
+    },
+    shareData: {
+      type: 'boolean',
+      description: "User opt in to share data",
     },
   },
 }

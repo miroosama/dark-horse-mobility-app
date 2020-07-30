@@ -3,6 +3,7 @@ import { FlatList, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import { Container, Text, Button } from 'native-base';
 import { Buckets, Client, KeyInfo, ThreadID  } from '@textile/hub';
 import ContractUtils from './ContractUtils';
+
 const tripData = require('./assets/demoTrip.json');
 
 const customData = require('./assets/demoTrip.json');
@@ -20,12 +21,13 @@ export default function Trips(props) {
   const [coordinates, setCoordinates] = useState();
   const [threadId, setThreadId] = useState();
   const [tripPoint, setTripPoint] = useState();
-ContractUtils();
+  // ContractUtils();
   useEffect(() => {
     const setCollection = async () => {
       let cachedThreadId = await getCachedTripThread();
 
       if (!cachedThreadId) {
+        console.log('here')
         cachedThreadId = ThreadID.fromRandom();
         await cacheTripThread(cachedThreadId);
         await db.newDB(cachedThreadId);
@@ -48,7 +50,7 @@ ContractUtils();
     let completedTrip;
     try {
       const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: '4',
+        _id: `${Date.now()}`,
         userEthAddress: tripData.user_eth_addr,
         userId: tripData.user_id,
         coordinates,

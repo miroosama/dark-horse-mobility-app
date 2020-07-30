@@ -32,8 +32,7 @@ export default function Login() {
 
   const createIdentityAndDb = async () => {
     try {
-      const idArr = await generateIdentity();
-      const id = idArr[0];
+      const id = await generateIdentity();
       const identity = id.toString();
       const info = {
         key: USER_API_KEY,
@@ -41,14 +40,24 @@ export default function Login() {
       };
       let userDb = new Client();
       userDb = await Client.withKeyInfo(info);
-
+      console.log(userDb)
       await userDb.getToken(id);
-      if (idArr[1]) {
+      const cachedUserThread = await getCachedUserThread();
+      console.log(cachedUserThread)
+      if (cachedUserThread) {
         setDb(userDb)
         setIdentity(identity);
         setCreatedUser(true);
       } else {
-        const cachedThreadId = ThreadID.fromString(USER_THREAD_ID);
+        const cachedThreadId = ThreadID.fromRandom();
+        await cacheUserThread(cachedThreadId);
+        console.log(1)
+        await userDb.newDB(cachedThreadId);
+        console.log(2)
+
+        await userDb.newCollection(cachedThreadId, 'User', userSchema);
+        console.log(3)
+
         userDb.context.withThread(cachedThreadId.toString());
         setDb(userDb);
         setIdentity(identity);
@@ -66,12 +75,14 @@ export default function Login() {
 
   const createUser = async () => {
       const ids = await db.create(threadId, 'User', [{
-        _id: '',
-        userAddress: identity,
+        _id: identity,
+        userAddress: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
         username,
         socialHandle,
         age: parseInt(age),
         occupancy,
+        adRewards: true,
+        shareData: true
       }]);
       if (ids.length) setCreatedUser(true);
   }
