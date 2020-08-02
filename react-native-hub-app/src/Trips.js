@@ -9,7 +9,8 @@ import {
   getAdContract,
   enableNewUser,
   getActiveCampaignIds,
-  getAd
+  getAd,
+  onAdRender
 } from './contractUtils';
 import {
   getCachedTripThread,
@@ -52,6 +53,7 @@ export default function Trips(props) {
     const mobilityInstance = await getAdContract(web3);
     const activeCampaignIds = await getActiveCampaignIds(mobilityInstance);
     const advert = await getAd(mobilityInstance, activeCampaignIds);
+    onAdRender(advert.data.key, advert.data)
     setAd(advert.ad);
   }
 
@@ -65,7 +67,7 @@ export default function Trips(props) {
     let completedTrip;
     try {
       const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: '25',
+        _id: '29',
         userEthAddress: USER_DEMO_ETH_ADR_G,
         userId: USER_DEMO_ETH_ADR_G,
         coordinates,
@@ -83,12 +85,10 @@ export default function Trips(props) {
     let index = 0;
     let tripInterval = setInterval(() => {
       if (!coordinates[index]) {
-        console.log('fin')
         clearInterval(tripInterval);
         setTripPoint('Finished Trip');
         addTrip();
       } else {
-        console.log('stillGOin')
         setTripPoint(`${coordinates[index][0]}, ${coordinates[index][1]}`)
         index++;
       }
@@ -98,10 +98,10 @@ export default function Trips(props) {
   return (
     <Container style={stylesheet.container}>
       { !showTrip
-       ? <Button onPress={() => startTrip()}>
-          <Text>Start Trip</Text>
+       ? <Button onPress={() => startTrip()} light>
+          <Text style={stylesheet.text}>Start Trip</Text>
         </Button>
-       : <Text>{tripPoint}</Text>
+       : <Text style={stylesheet.text}>{tripPoint}</Text>
      }
      { ad
       ? <View>

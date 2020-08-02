@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import { USER_DEMO_ETH_PVK_G, USER_DEMO_ETH_ADR_G } from 'react-native-dotenv';
+import {
+  REACT_APP_FLEEK_API_KEY,
+  REACT_APP_FLEEK_API_SECRET,
+  USER_DEMO_ETH_PVK_G,
+  USER_DEMO_ETH_ADR_G } from 'react-native-dotenv';
 import fleekStorage from '@fleekhq/fleek-storage-js';
 
 const MobilityCampaignsContract = require('./assets/MobilityCampaigns.json');
+const ADS_DIRECTORY = 'campaigns';
+const BUCKET = 'hackfs-dark-horse-bucket';
 
 export async function getWeb3() {
   const web3 = await new Web3(
@@ -22,27 +28,26 @@ export async function getAdContract(web3) {
   return mobilityInstance;
 }
 
-// export async function getAd(mobilityInstance) {
-//   const tx = {
-//     from: fromAddress,
-//     to: toAddress,
-//     gas: gasLimit,
-//     value: value,
-//     data: mobilityInstance.methods.getAd().encodeABI()
-//   };
-//   const signPromise = web3.eth.accounts.signTransaction(tx, privateKey)
-//   .then((signedTx) => {
-//     const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
-//     sentTx.on("receipt", receipt => {
-//       // do something when receipt comes back
-//       });
-//       sentTx.on("error", err => {
-//         // do something on transaction error
-//       });
-//     }).catch((err) => {
-//       console.log(err)
-//   });
-// }
+export async function onAdRender(key, data) {
+  try {
+    console.log('writing data...', data);
+
+    const res = await fleekStorage.upload({
+      apiKey: REACT_APP_FLEEK_API_KEY,
+      apiSecret: REACT_APP_FLEEK_API_SECRET,
+      key: `${ADS_DIRECTORY}/${key}/results`,
+      bucket: BUCKET,
+      data: JSON.stringify(data)
+    });
+
+    console.log(`uploaded json data to: ${`${ADS_DIRECTORY}/${key}/results`}`);
+    console.log(res.hash);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
 
 export async function getActiveCampaignIds(mobilityInstance) {
   const activeCampaignIds = await mobilityInstance.methods.getActiveCampaignIdsUsers().call();
@@ -57,7 +62,8 @@ export async function getAd(mobilityInstance, activeCampaignIds) {
   return {
     organization: data.organization,
     title: data.title,
-    ad: fileData
+    ad: fileData,
+    data
   };
 }
 

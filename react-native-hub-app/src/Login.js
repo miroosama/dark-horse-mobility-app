@@ -132,7 +132,7 @@ export default function Login() {
               value={occupancy} />
           </Item>
         </Form>
-        <Button onPress={createUser}>
+        <Button onPress={createUser} light>
           <Text>Create</Text>
         </Button>
       </Content>
