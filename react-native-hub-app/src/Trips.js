@@ -65,7 +65,7 @@ export default function Trips(props) {
     let completedTrip;
     try {
       const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: '22',
+        _id: '25',
         userEthAddress: USER_DEMO_ETH_ADR_G,
         userId: USER_DEMO_ETH_ADR_G,
         coordinates,
