@@ -2,10 +2,21 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { ThreadID } from '@textile/hub'
 import { Libp2pCryptoIdentity } from '@textile/threads-core'
 
-const version = 500009 //Math.floor(Math.random() * 1000);
-const IDENTITY_KEY = 'identity-' + version
+const versionId = 10000 //Math.floor(Math.random() * 1000);
+const version = 10014 //Math.floor(Math.random() * 1000);
+const IDENTITY_KEY = 'identity-' + versionId
 const USER_THREAD_ID_V = 'user-thread-' + version
 const TRIP_THREAD_ID_V = 'user-thread-' + version
+
+export const clearAppData = async () => {
+    try {
+        const keys = await AsyncStorage.getAllKeys();
+        console.log(keys)
+        await AsyncStorage.multiRemove(keys);
+    } catch (error) {
+        console.error('Error clearing app data.');
+    }
+}
 
 export const cacheUserThread = async (id: ThreadID) => {
   await AsyncStorage.setItem(USER_THREAD_ID_V, id.toString())

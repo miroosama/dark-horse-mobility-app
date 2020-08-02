@@ -13,7 +13,7 @@ const App: () => React$Node = () => {
   return (
     <View style={styles.container}>
       <Header>
-        <Text>Mobility</Text>
+        <Text>Dark Horse Mobility</Text>
       </Header>
       <Login />
     </View>

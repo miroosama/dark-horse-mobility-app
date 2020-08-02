@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FlatList, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import { Container, Text, Button } from 'native-base';
 import { Buckets, Client, KeyInfo, ThreadID  } from '@textile/hub';
-import ContractUtils from './ContractUtils';
+// import ContractUtils from './ContractUtils';
 
 const tripData = require('./assets/demoTrip.json');
 
@@ -21,7 +21,7 @@ export default function Trips(props) {
   const [coordinates, setCoordinates] = useState();
   const [threadId, setThreadId] = useState();
   const [tripPoint, setTripPoint] = useState();
-  // ContractUtils();
+
   useEffect(() => {
     const setCollection = async () => {
       let cachedThreadId = await getCachedTripThread();

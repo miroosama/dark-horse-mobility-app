@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, TouchableOpacity, Linking, StyleSheet } from 'react-native';
-import { Container, Text, Content, Form, Item, Input } from 'native-base';
+import { Container, Text, Content, Form, Item, Input, Button } from 'native-base';
 import Prompt from 'react-native-input-prompt';
 
 import { USER_API_SECRET, USER_API_KEY, USER_THREAD_ID } from 'react-native-dotenv';
@@ -14,7 +14,13 @@ import {
   getCachedUserThread,
   cacheUserThread,
   userSchema,
+  clearAppData
 } from './helpers';
+import {
+  getWeb3,
+  getAdContract,
+  enableNewUser
+} from './contractUtils';
 import stylesheet from './stylesheet';
 import Trips from './Trips';
 
@@ -30,6 +36,12 @@ export default function Login() {
   const [occupancy, setOccupancy] = useState();
   const [createdUser, setCreatedUser] = useState(false);
 
+  const addUserToCampaign = async () => {
+    const web3 = await getWeb3();
+    const contractInstance = await getAdContract(web3);
+    const newUserSet = enableNewUser(web3, contractInstance);
+  }
+
   const createIdentityAndDb = async () => {
     try {
       const id = await generateIdentity();
@@ -40,7 +52,6 @@ export default function Login() {
       };
       let userDb = new Client();
       userDb = await Client.withKeyInfo(info);
-      console.log(userDb)
       await userDb.getToken(id);
       const cachedUserThread = await getCachedUserThread();
       console.log(cachedUserThread)
@@ -49,14 +60,14 @@ export default function Login() {
         setIdentity(identity);
         setCreatedUser(true);
       } else {
-        const cachedThreadId = ThreadID.fromRandom();
-        await cacheUserThread(cachedThreadId);
-        console.log(1)
-        await userDb.newDB(cachedThreadId);
-        console.log(2)
+        const cachedThreadId = ThreadID.fromString(USER_THREAD_ID);
+        // const cachedThreadId = ThreadID.fromRandom();
 
-        await userDb.newCollection(cachedThreadId, 'User', userSchema);
-        console.log(3)
+        await cacheUserThread(cachedThreadId.toString());
+        console.log(cachedThreadId.toString())
+        // await userDb.newDB(cachedThreadId);
+        // use same collection
+        // await userDb.newCollection(cachedThreadId, 'User', userSchema);
 
         userDb.context.withThread(cachedThreadId.toString());
         setDb(userDb);
@@ -75,7 +86,7 @@ export default function Login() {
 
   const createUser = async () => {
       const ids = await db.create(threadId, 'User', [{
-        _id: identity,
+        _id: ``,
         userAddress: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
         username,
         socialHandle,
@@ -84,7 +95,11 @@ export default function Login() {
         adRewards: true,
         shareData: true
       }]);
-      if (ids.length) setCreatedUser(true);
+      if (ids.length) {
+        addUserToCampaign();
+        setOpenPrompt(false);
+        setCreatedUser(true);
+      }
   }
 
   const userForm = () => {
@@ -116,10 +131,10 @@ export default function Login() {
               placeholder="Occupancy"
               value={occupancy} />
           </Item>
-          <TouchableOpacity onPress={createUser}>
-            <Text>Create</Text>
-          </TouchableOpacity>
         </Form>
+        <Button onPress={createUser}>
+          <Text>Create</Text>
+        </Button>
       </Content>
     );
   }
