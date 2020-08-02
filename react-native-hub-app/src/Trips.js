@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, TouchableOpacity, Linking, StyleSheet } from 'react-native';
+import { FlatList, TouchableOpacity, Linking, StyleSheet, Image } from 'react-native';
 import { Container, Text, Button } from 'native-base';
 import { Buckets, Client, KeyInfo, ThreadID  } from '@textile/hub';
-// import ContractUtils from './ContractUtils';
 
-const tripData = require('./assets/demoTrip.json');
-
-const customData = require('./assets/demoTrip.json');
+import { USER_DEMO_ETH_ADR_G } from 'react-native-dotenv';
+import {
+  getWeb3,
+  getAdContract,
+  enableNewUser,
+  getActiveCampaignIds,
+  getAd
+} from './contractUtils';
 import {
   getCachedTripThread,
   cacheTripThread,
   tripSchema
 } from './helpers';
-
 import stylesheet from './stylesheet';
+
+const tripData = require('./assets/demoTrip.json');
+const customData = require('./assets/demoTrip.json');
 
 export default function Trips(props) {
   const { db } = props;
@@ -21,11 +27,12 @@ export default function Trips(props) {
   const [coordinates, setCoordinates] = useState();
   const [threadId, setThreadId] = useState();
   const [tripPoint, setTripPoint] = useState();
+  const [ad, setAd] = useState();
 
   useEffect(() => {
     const setCollection = async () => {
       let cachedThreadId = await getCachedTripThread();
-
+      console.log("------", cachedThreadId)
       if (!cachedThreadId) {
         console.log('here')
         cachedThreadId = ThreadID.fromRandom();
@@ -40,6 +47,14 @@ export default function Trips(props) {
     setCoordinates(coordArr);
   }, []);
 
+  const showAd = async () => {
+    const web3 = await getWeb3();
+    const mobilityInstance = await getAdContract(web3);
+    const activeCampaignIds = await getActiveCampaignIds(mobilityInstance);
+    const advert = getAd(mobilityInstance, activeCampaignIds);
+    setAd(advert.ad);
+  }
+
   const addTrip = async () => {
     console.log("here")
     const timestamps = tripData.route.features.map((trip) => trip.properties.timestamp);
@@ -50,13 +65,14 @@ export default function Trips(props) {
     let completedTrip;
     try {
       const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: `${Date.now()}`,
-        userEthAddress: tripData.user_eth_addr,
-        userId: tripData.user_id,
+        _id: '2',
+        userEthAddress: USER_DEMO_ETH_ADR_G,
+        userId: USER_DEMO_ETH_ADR_G,
         coordinates,
         timestamps,
       }]);
       console.log(completedTrip);
+      showAd();
     } catch(err) {
       console.log(err.message)
     }
@@ -87,6 +103,13 @@ export default function Trips(props) {
         </Button>
        : <Text>{tripPoint}</Text>
      }
+     { ad
+      ? <Image
+          style={stylesheet.adImg}
+          source={ad}
+        />
+      : null
+    }
     </Container>
   );
 }

@@ -9,7 +9,11 @@ const stylesheet = StyleSheet.create({
     flexDirection: 'column', // main axis
     justifyContent: 'center', // main axis
     alignItems: 'center', // cross axis
-  }
+  },
+  adImg: {
+    width: 100,
+    height: 200,
+  },
 })
 
 export default stylesheet;

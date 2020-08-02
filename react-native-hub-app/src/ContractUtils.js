@@ -51,7 +51,8 @@ export async function getActiveCampaignIds(mobilityInstance) {
 }
 
 export async function getAd(mobilityInstance, activeCampaignIds) {
-  const id = sample(activeCampaignIds);
+  // const id = sample(activeCampaignIds);
+  const id = activeCampaignIds[0];
   const data = await mobilityInstance.getActiveCampaignUsers(id, { from: USER_DEMO_ETH_ADR_G });
   const fileData = await fleekStorage.getFileFromHash({ hash: data.ipfsHash });
 
