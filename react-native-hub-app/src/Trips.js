@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, TouchableOpacity, Linking, StyleSheet, Image } from 'react-native';
+import { FlatList, TouchableOpacity, Linking, StyleSheet, Image, View } from 'react-native';
 import { Container, Text, Button } from 'native-base';
 import { Buckets, Client, KeyInfo, ThreadID  } from '@textile/hub';
 
@@ -51,7 +51,7 @@ export default function Trips(props) {
     const web3 = await getWeb3();
     const mobilityInstance = await getAdContract(web3);
     const activeCampaignIds = await getActiveCampaignIds(mobilityInstance);
-    const advert = getAd(mobilityInstance, activeCampaignIds);
+    const advert = await getAd(mobilityInstance, activeCampaignIds);
     setAd(advert.ad);
   }
 
@@ -65,7 +65,7 @@ export default function Trips(props) {
     let completedTrip;
     try {
       const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: '2',
+        _id: '22',
         userEthAddress: USER_DEMO_ETH_ADR_G,
         userId: USER_DEMO_ETH_ADR_G,
         coordinates,
@@ -104,10 +104,15 @@ export default function Trips(props) {
        : <Text>{tripPoint}</Text>
      }
      { ad
-      ? <Image
-          style={stylesheet.adImg}
-          source={ad}
-        />
+      ? <View>
+          <Image
+            style={stylesheet.adImg}
+            source={{
+              uri:
+                ad,
+            }}
+          />
+        </View>
       : null
     }
     </Container>

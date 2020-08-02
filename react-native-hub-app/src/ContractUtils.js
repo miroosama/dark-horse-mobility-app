@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import { USER_DEMO_ETH_PVK_G, USER_DEMO_ETH_ADR_G } from 'react-native-dotenv';
+import fleekStorage from '@fleekhq/fleek-storage-js';
 
 const MobilityCampaignsContract = require('./assets/MobilityCampaigns.json');
 
@@ -44,18 +45,15 @@ export async function getAdContract(web3) {
 // }
 
 export async function getActiveCampaignIds(mobilityInstance) {
-  const activeCampaignIds = await mobilityInstance.getActiveCampaignIdsUsers({
-    from : USER_DEMO_ETH_ADR_G
-  });
+  const activeCampaignIds = await mobilityInstance.methods.getActiveCampaignIdsUsers().call();
   return activeCampaignIds;
 }
 
 export async function getAd(mobilityInstance, activeCampaignIds) {
   // const id = sample(activeCampaignIds);
   const id = activeCampaignIds[0];
-  const data = await mobilityInstance.getActiveCampaignUsers(id, { from: USER_DEMO_ETH_ADR_G });
+  const data = await mobilityInstance.methods.getActiveCampaignUsers(id).call();
   const fileData = await fleekStorage.getFileFromHash({ hash: data.ipfsHash });
-
   return {
     organization: data.organization,
     title: data.title,
