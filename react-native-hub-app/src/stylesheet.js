@@ -7,16 +7,26 @@ const stylesheet = StyleSheet.create({
   container: {
     backgroundColor: '#303030',
     flex: 1,
-    flexDirection: 'column', // main axis
-    justifyContent: 'center', // main axis
-    alignItems: 'center', // cross axis
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  login: {
+    backgroundColor: '#303030',
   },
   adImg: {
-    width: 200,
-    height: 400,
+    width: 250,
+    height: 500,
   },
   text: {
     color: 'white'
+  },
+  submitBtn: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40
   }
 })
 

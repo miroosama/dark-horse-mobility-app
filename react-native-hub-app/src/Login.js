@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, TouchableOpacity, Linking, StyleSheet } from 'react-native';
+import { FlatList, TouchableOpacity, Linking, StyleSheet, View } from 'react-native';
 import { Container, Text, Content, Form, Item, Input, Button } from 'native-base';
 import Prompt from 'react-native-input-prompt';
 
@@ -36,6 +36,14 @@ export default function Login() {
   const [occupancy, setOccupancy] = useState();
   const [createdUser, setCreatedUser] = useState(false);
 
+  const readUsers = async () => {
+    console.log('1', threadId.buf)
+    const r = await db.find(threadId, 'User', undefined);
+    console.log(r)
+    const ids = r.instancesList.map((instance) => [instance._id, instance.socialHandle, instance.username, instance.occupancy]);
+    console.log(ids)
+  }
+
   const addUserToCampaign = async () => {
     const web3 = await getWeb3();
     const contractInstance = await getAdContract(web3);
@@ -63,13 +71,13 @@ export default function Login() {
         const cachedThreadId = ThreadID.fromString(USER_THREAD_ID);
         // const cachedThreadId = ThreadID.fromRandom();
 
-        await cacheUserThread(cachedThreadId.toString());
+        await cacheUserThread(cachedThreadId);
         console.log(cachedThreadId.toString())
         // await userDb.newDB(cachedThreadId);
         // use same collection
         // await userDb.newCollection(cachedThreadId, 'User', userSchema);
 
-        userDb.context.withThread(cachedThreadId.toString());
+        // userDb.context.withThread(cachedThreadId.toString());
         setDb(userDb);
         setIdentity(identity);
         setThreadId(cachedThreadId);
@@ -86,7 +94,7 @@ export default function Login() {
 
   const createUser = async () => {
       const ids = await db.create(threadId, 'User', [{
-        _id: ``,
+        _id: `21`,
         userAddress: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
         username,
         socialHandle,
@@ -96,7 +104,8 @@ export default function Login() {
         shareData: true
       }]);
       if (ids.length) {
-        addUserToCampaign();
+        // addUserToCampaign();
+        readUsers();
         setOpenPrompt(false);
         setCreatedUser(true);
       }
@@ -105,21 +114,24 @@ export default function Login() {
   const userForm = () => {
     return (
       <Content style={stylesheet.content}>
-        <Form>
+        <Form light>
           <Item>
             <Input
+              style={stylesheet.text}
               onChangeText={(val) => setUsername(val)}
               placeholder="Username"
               value={username} />
           </Item>
           <Item>
             <Input
+              style={stylesheet.text}
               onChangeText={(val) => setSocial(val)}
               placeholder="Instagram Handle"
               value={socialHandle} />
           </Item>
           <Item>
             <Input
+              style={stylesheet.text}
               keyboardType='numeric'
               onChangeText={(val) => setAge(val.replace(/[^0-9]/g, ''))}
               placeholder="Age"
@@ -127,30 +139,29 @@ export default function Login() {
           </Item>
           <Item>
             <Input
+              style={stylesheet.text}
               onChangeText={(val) => setOccupancy(val)}
               placeholder="Occupancy"
               value={occupancy} />
           </Item>
         </Form>
-        <Button onPress={createUser} light>
-          <Text>Create</Text>
-        </Button>
+        <View style={stylesheet.submitBtn}>
+          <Button onPress={createUser} light>
+            <Text style={stylesheet.text}>Create</Text>
+          </Button>
+        </View>
       </Content>
     );
   }
 
   return (
-    <Container>
-      {
-        openPrompt
+    <Container style={stylesheet.login}>
+      { openPrompt
         ? userForm()
-        : null
-      }
-      {
-        createdUser
+        : null }
+      { createdUser
         ? <Trips db={db} identity={identity}/>
-        : null
-      }
+        : null }
     </Container>
   );
 }

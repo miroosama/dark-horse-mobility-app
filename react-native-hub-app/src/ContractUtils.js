@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
+import { sample } from 'lodash/collection';
 import {
   REACT_APP_FLEEK_API_KEY,
   REACT_APP_FLEEK_API_SECRET,
-  USER_DEMO_ETH_PVK_G,
-  USER_DEMO_ETH_ADR_G } from 'react-native-dotenv';
+  USER_DEMO_ETH_PVK,
+  USER_DEMO_ETH_ADR } from 'react-native-dotenv';
 import fleekStorage from '@fleekhq/fleek-storage-js';
 
 const MobilityCampaignsContract = require('./assets/MobilityCampaigns.json');
+const INFURA_ENDPOINT = 'https://ropsten.infura.io/v3/5e044d2bade54929a78905f13194ddb1';
 const ADS_DIRECTORY = 'campaigns';
 const BUCKET = 'hackfs-dark-horse-bucket';
 
@@ -55,8 +57,7 @@ export async function getActiveCampaignIds(mobilityInstance) {
 }
 
 export async function getAd(mobilityInstance, activeCampaignIds) {
-  // const id = sample(activeCampaignIds);
-  const id = activeCampaignIds[0];
+  const id = sample(activeCampaignIds);
   const data = await mobilityInstance.methods.getActiveCampaignUsers(id).call();
   const fileData = await fleekStorage.getFileFromHash({ hash: data.ipfsHash });
   return {
@@ -69,12 +70,12 @@ export async function getAd(mobilityInstance, activeCampaignIds) {
 
 export async function enableNewUser(web3, mobilityInstance) {
   const tx = {
-    from: USER_DEMO_ETH_ADR_G,
-    to: '0xEAA2812e5E9cddce4cb7eDBEb4b9f91340DCbB26',
+    from: USER_DEMO_ETH_ADR,
+    to: mobilityInstance.address,
     gas: 1000000,
     data: mobilityInstance.methods.enableNewUser().encodeABI()
   };
-  const signPromise = web3.eth.accounts.signTransaction(tx, USER_DEMO_ETH_PVK_G)
+  const signPromise = web3.eth.accounts.signTransaction(tx, USER_DEMO_ETH_PVK)
   .then((signedTx) => {
     const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
     sentTx.on("receipt", receipt => {
