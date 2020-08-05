@@ -5,7 +5,8 @@ import {
   REACT_APP_FLEEK_API_KEY,
   REACT_APP_FLEEK_API_SECRET,
   USER_DEMO_ETH_PVK,
-  USER_DEMO_ETH_ADR } from 'react-native-dotenv';
+  USER_DEMO_ETH_ADR
+} from 'react-native-dotenv';
 import fleekStorage from '@fleekhq/fleek-storage-js';
 
 const MobilityCampaignsContract = require('./assets/MobilityCampaigns.json');
@@ -15,7 +16,7 @@ const BUCKET = 'hackfs-dark-horse-bucket';
 
 export async function getWeb3() {
   const web3 = await new Web3(
-      new Web3.providers.HttpProvider('http://127.0.0.1:8545')
+      new Web3.providers.HttpProvider(INFURA_ENDPOINT)
   );
   if (web3) return web3;
 }
@@ -52,14 +53,16 @@ export async function onAdRender(key, data) {
 }
 
 export async function getActiveCampaignIds(mobilityInstance) {
-  const activeCampaignIds = await mobilityInstance.methods.getActiveCampaignIdsUsers().call();
+  const activeCampaignIds = await mobilityInstance.methods.getActiveCampaignIdsUsers().call({ from: USER_DEMO_ETH_ADR });
   return activeCampaignIds;
 }
 
 export async function getAd(mobilityInstance, activeCampaignIds) {
   const id = sample(activeCampaignIds);
+  console.log(id)
   const data = await mobilityInstance.methods.getActiveCampaignUsers(id).call();
   const fileData = await fleekStorage.getFileFromHash({ hash: data.ipfsHash });
+  console.log(fileData)
   return {
     organization: data.organization,
     title: data.title,
@@ -71,10 +74,11 @@ export async function getAd(mobilityInstance, activeCampaignIds) {
 export async function enableNewUser(web3, mobilityInstance) {
   const tx = {
     from: USER_DEMO_ETH_ADR,
-    to: mobilityInstance.address,
-    gas: 1000000,
+    to: '0x72E14B32f4F4818F3629Ee4AA88AF7b2CB85665b',
+    gas: 1500000,
     data: mobilityInstance.methods.enableNewUser().encodeABI()
   };
+  // const pk = Buffer.from(USER_DEMO_ETH_PVK, 'hex');
   const signPromise = web3.eth.accounts.signTransaction(tx, USER_DEMO_ETH_PVK)
   .then((signedTx) => {
     const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);

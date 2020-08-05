@@ -36,13 +36,12 @@ export default function Login() {
   const [occupancy, setOccupancy] = useState();
   const [createdUser, setCreatedUser] = useState(false);
 
-  const readUsers = async () => {
-    console.log('1', threadId.buf)
-    const r = await db.find(threadId, 'User', undefined);
-    console.log(r)
-    const ids = r.instancesList.map((instance) => [instance._id, instance.socialHandle, instance.username, instance.occupancy]);
-    console.log(ids)
-  }
+  // const readUsers = async () => {
+  //   const r = await db.find(threadId, 'User', undefined);
+  //   console.log(r)
+  //   const ids = r.instancesList.map((instance) => [instance._id, instance.socialHandle, instance.username, instance.occupancy]);
+  //   console.log(ids)
+  // }
 
   const addUserToCampaign = async () => {
     const web3 = await getWeb3();
@@ -94,8 +93,8 @@ export default function Login() {
 
   const createUser = async () => {
       const ids = await db.create(threadId, 'User', [{
-        _id: `21`,
-        userAddress: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
+        _id: '135',
+        userAddress: '0x401aF064fcf5387ba77827DEcd0c26D16DBF9D8E',
         username,
         socialHandle,
         age: parseInt(age),
@@ -103,9 +102,9 @@ export default function Login() {
         adRewards: true,
         shareData: true
       }]);
+      console.log(ids)
       if (ids.length) {
-        // addUserToCampaign();
-        readUsers();
+        addUserToCampaign();
         setOpenPrompt(false);
         setCreatedUser(true);
       }
@@ -160,7 +159,14 @@ export default function Login() {
         ? userForm()
         : null }
       { createdUser
-        ? <Trips db={db} identity={identity}/>
+        ? <Trips
+            username={username}
+            socialHandle={socialHandle}
+            age={age}
+            occupancy={occupancy}
+            db={db}
+            identity={identity}
+          />
         : null }
     </Container>
   );

@@ -23,25 +23,35 @@ const tripData = require('./assets/demoTrip.json');
 const customData = require('./assets/demoTrip.json');
 
 export default function Trips(props) {
-  const { db } = props;
+  const {
+    db,
+    username,
+    socialHandle,
+    age,
+    occupancy
+  } = props;
   const [showTrip, setShowTrip] = useState(false);
   const [coordinates, setCoordinates] = useState();
   const [threadId, setThreadId] = useState();
   const [tripPoint, setTripPoint] = useState();
   const [ad, setAd] = useState();
+  const [adInfo, setAdInfo] = useState();
 
   useEffect(() => {
     const setCollection = async () => {
       let cachedThreadId = await getCachedTripThread();
-      console.log("------", cachedThreadId)
+      console.log('AAA', cachedThreadId)
+      if (cachedThreadId) setThreadId(cachedThreadId);
       if (!cachedThreadId) {
-        console.log('here')
         cachedThreadId = ThreadID.fromRandom();
         await cacheTripThread(cachedThreadId);
         await db.newDB(cachedThreadId);
         await db.newCollection(cachedThreadId, 'Trip', tripSchema);
+        await db.context.withThread(cachedThreadId.toString());
+        console.log(cachedThreadId);
+        setThreadId(cachedThreadId);
+        console.log("FINISHED")
       }
-      setThreadId(cachedThreadId);
     }
     setCollection();
     const coordArr = tripData.route.features.map((trip) => trip.geometry.coordinates);
@@ -50,26 +60,34 @@ export default function Trips(props) {
 
   const showAd = async () => {
     const web3 = await getWeb3();
+    console.log(1, web3)
     const mobilityInstance = await getAdContract(web3);
+    console.log(2, mobilityInstance)
     const activeCampaignIds = await getActiveCampaignIds(mobilityInstance);
+    console.log(3, activeCampaignIds)
     const advert = await getAd(mobilityInstance, activeCampaignIds);
-    onAdRender(advert.data.key, advert.data)
+    console.log(4, adver)
+
+    // onAdRender(advert.data.key, {
+    //   username,
+    //   socialHandle,
+    //   age,
+    //   occupancy
+    // });
     setAd(advert.ad);
+    setAdInfo(advert.title)
   }
 
   const addTrip = async () => {
     console.log("here")
     const timestamps = tripData.route.features.map((trip) => trip.properties.timestamp);
-    // console.log(tripData.user_eth_addr)
-    // console.log(tripData.user_id)
-    // console.log(coordinates)
-    // console.log(timestamps)
     let completedTrip;
+    console.log('ahahahahah', threadId)
     try {
       const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: '29',
-        userEthAddress: USER_DEMO_ETH_ADR_G,
-        userId: USER_DEMO_ETH_ADR_G,
+        _id: '50',
+        userEthAddress: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
+        userId: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
         coordinates,
         timestamps,
       }]);
@@ -112,6 +130,7 @@ export default function Trips(props) {
                 ad,
             }}
           />
+          <Text style={stylesheet.text}>You've received a reward from {adInfo}!</Text>
         </View>
       : null
     }
