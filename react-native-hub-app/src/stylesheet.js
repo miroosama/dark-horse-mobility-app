@@ -15,8 +15,9 @@ const stylesheet = StyleSheet.create({
     backgroundColor: '#303030',
   },
   adImg: {
-    width: 250,
-    height: 500,
+    resizeMode:'contain',
+    width: '100%',
+    height: '65%',
   },
   text: {
     color: 'white'
@@ -27,6 +28,18 @@ const stylesheet = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 40
+  },
+  adContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '65%'
+  },
+  rwdContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 })
 

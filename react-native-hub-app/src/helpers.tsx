@@ -3,10 +3,11 @@ import { ThreadID } from '@textile/hub'
 import { Libp2pCryptoIdentity } from '@textile/threads-core'
 
 const versionId = 10000 //Math.floor(Math.random() * 1000);
-const version = 10169 //Math.floor(Math.random() * 1000);
+const version = 10241 //Math.floor(Math.random() * 1000);
+const versionTrip = 10200 //Math.floor(Math.random() * 1000);
 const IDENTITY_KEY = 'identity-' + versionId
 const USER_THREAD_ID_V = 'user-thread-' + version
-const TRIP_THREAD_ID_V = 'trip-thread-' + version
+const TRIP_THREAD_ID_V = 'trip-thread-' + versionTrip
 
 export const clearAppData = async () => {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FlatList, TouchableOpacity, Linking, StyleSheet, Image, View } from 'react-native';
 import { Container, Text, Button } from 'native-base';
 import { Buckets, Client, KeyInfo, ThreadID  } from '@textile/hub';
@@ -10,7 +10,8 @@ import {
   enableNewUser,
   getActiveCampaignIds,
   getAd,
-  onAdRender
+  onAdRender,
+  getRewards
 } from './contractUtils';
 import {
   getCachedTripThread,
@@ -19,6 +20,7 @@ import {
 } from './helpers';
 import stylesheet from './stylesheet';
 
+const uuid = require('react-native-uuid');
 const tripData = require('./assets/demoTrip.json');
 const customData = require('./assets/demoTrip.json');
 
@@ -32,26 +34,25 @@ export default function Trips(props) {
   } = props;
   const [showTrip, setShowTrip] = useState(false);
   const [coordinates, setCoordinates] = useState();
-  const [threadId, setThreadId] = useState();
   const [tripPoint, setTripPoint] = useState();
   const [ad, setAd] = useState();
   const [adInfo, setAdInfo] = useState();
+  const [rewardInfo, setRewardInfo] = useState(false);
+  const threadRef = useRef();
 
   useEffect(() => {
     const setCollection = async () => {
       let cachedThreadId = await getCachedTripThread();
       console.log('AAA', cachedThreadId)
-      if (cachedThreadId) setThreadId(cachedThreadId);
       if (!cachedThreadId) {
         cachedThreadId = ThreadID.fromRandom();
         await cacheTripThread(cachedThreadId);
         await db.newDB(cachedThreadId);
         await db.newCollection(cachedThreadId, 'Trip', tripSchema);
         await db.context.withThread(cachedThreadId.toString());
-        console.log(cachedThreadId);
-        setThreadId(cachedThreadId);
         console.log("FINISHED")
       }
+      threadRef.current = cachedThreadId;
     }
     setCollection();
     const coordArr = tripData.route.features.map((trip) => trip.geometry.coordinates);
@@ -60,32 +61,28 @@ export default function Trips(props) {
 
   const showAd = async () => {
     const web3 = await getWeb3();
-    console.log(1, web3)
     const mobilityInstance = await getAdContract(web3);
-    console.log(2, mobilityInstance)
     const activeCampaignIds = await getActiveCampaignIds(mobilityInstance);
-    console.log(3, activeCampaignIds)
     const advert = await getAd(mobilityInstance, activeCampaignIds);
-    console.log(4, adver)
 
-    // onAdRender(advert.data.key, {
-    //   username,
-    //   socialHandle,
-    //   age,
-    //   occupancy
-    // });
+    onAdRender(advert.data.key, {
+      username,
+      socialHandle,
+      age,
+      occupancy
+    });
     setAd(advert.ad);
-    setAdInfo(advert.title)
+    setAdInfo(advert.organization)
   }
 
   const addTrip = async () => {
     console.log("here")
     const timestamps = tripData.route.features.map((trip) => trip.properties.timestamp);
     let completedTrip;
-    console.log('ahahahahah', threadId)
+    console.log('ahahahahah', threadRef.current)
     try {
-      const completedTrip = await db.create(threadId, 'Trip', [{
-        _id: '50',
+      const completedTrip = await db.create(threadRef.current, 'Trip', [{
+        _id: uuid.v1(),
         userEthAddress: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
         userId: '0x48C0b9F29aCe4d18C9a394E6d76b1de855830A6a',
         coordinates,
@@ -110,19 +107,29 @@ export default function Trips(props) {
         setTripPoint(`${coordinates[index][0]}, ${coordinates[index][1]}`)
         index++;
       }
-    }, 300);
+    }, 200);
+  }
+
+  const claimReward = async () => {
+    const web3 = await getWeb3();
+    const mobilityInstance = await getAdContract(web3);
+    const rewards = await getRewards(web3, mobilityInstance);
+    // if (rewards) setRewardInfo(true);
+    const newBalance = await web3.eth.getBalance('0x401aF064fcf5387ba77827DEcd0c26D16DBF9D8E');
+    const balance = web3.utils.fromWei(newBalance, 'ether');
+    setRewardInfo(balance);
   }
 
   return (
     <Container style={stylesheet.container}>
-      { !showTrip
+      { !showTrip && !ad
        ? <Button onPress={() => startTrip()} light>
           <Text style={stylesheet.text}>Start Trip</Text>
         </Button>
        : <Text style={stylesheet.text}>{tripPoint}</Text>
      }
      { ad
-      ? <View>
+      ? <View style={stylesheet.adContainer}>
           <Image
             style={stylesheet.adImg}
             source={{
@@ -130,7 +137,15 @@ export default function Trips(props) {
                 ad,
             }}
           />
-          <Text style={stylesheet.text}>You've received a reward from {adInfo}!</Text>
+          { !rewardInfo
+          ? <View style={stylesheet.rwdContainer}>
+              <Text style={stylesheet.text}>You received a reward from {adInfo}!</Text>
+              <Button onPress={() => claimReward()} light>
+                <Text style={stylesheet.text}>Claim Rewards</Text>
+              </Button>
+            </View>
+          : <Text style={stylesheet.text}>Your new balance is {rewardInfo} ETH!</Text>
+          }
         </View>
       : null
     }

@@ -53,16 +53,18 @@ export async function onAdRender(key, data) {
 }
 
 export async function getActiveCampaignIds(mobilityInstance) {
-  const activeCampaignIds = await mobilityInstance.methods.getActiveCampaignIdsUsers().call({ from: USER_DEMO_ETH_ADR });
+  const activeCampaignIds = await mobilityInstance.methods.getActiveCampaignIdsUsers().call({
+    from: USER_DEMO_ETH_ADR
+  });
+  console.log(activeCampaignIds)
   return activeCampaignIds;
 }
 
 export async function getAd(mobilityInstance, activeCampaignIds) {
-  const id = sample(activeCampaignIds);
-  console.log(id)
-  const data = await mobilityInstance.methods.getActiveCampaignUsers(id).call();
+  // const id = sample(activeCampaignIds);
+  const id = activeCampaignIds[activeCampaignIds.length - 1];
+  const data = await mobilityInstance.methods.getActiveCampaignUsers(id).call({ from: USER_DEMO_ETH_ADR });
   const fileData = await fleekStorage.getFileFromHash({ hash: data.ipfsHash });
-  console.log(fileData)
   return {
     organization: data.organization,
     title: data.title,
@@ -74,16 +76,39 @@ export async function getAd(mobilityInstance, activeCampaignIds) {
 export async function enableNewUser(web3, mobilityInstance) {
   const tx = {
     from: USER_DEMO_ETH_ADR,
-    to: '0x72E14B32f4F4818F3629Ee4AA88AF7b2CB85665b',
-    gas: 1500000,
+    to: '0xeE0D01bA8BbF20Bbe0f463A4Fbed80Cad844c724',
+    gas: 1000000,
     data: mobilityInstance.methods.enableNewUser().encodeABI()
   };
-  // const pk = Buffer.from(USER_DEMO_ETH_PVK, 'hex');
+
   const signPromise = web3.eth.accounts.signTransaction(tx, USER_DEMO_ETH_PVK)
   .then((signedTx) => {
     const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
     sentTx.on("receipt", receipt => {
       console.log(receipt)
+      });
+      sentTx.on("error", err => {
+        console.log(err)
+      });
+  }).catch((err) => {
+        console.log(err)
+  });
+}
+
+export async function getRewards(web3, mobilityInstance) {
+  const tx = {
+    from: USER_DEMO_ETH_ADR,
+    to: '0xeE0D01bA8BbF20Bbe0f463A4Fbed80Cad844c724',
+    gas: 2000000,
+    data: mobilityInstance.methods.withdrawRewards().encodeABI()
+  };
+
+  const signPromise = web3.eth.accounts.signTransaction(tx, USER_DEMO_ETH_PVK)
+  .then((signedTx) => {
+    const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
+    sentTx.on("receipt", receipt => {
+      console.log(receipt)
+      return receipt
       });
       sentTx.on("error", err => {
         console.log(err)

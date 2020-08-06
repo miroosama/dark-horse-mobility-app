@@ -24,6 +24,8 @@ import {
 import stylesheet from './stylesheet';
 import Trips from './Trips';
 
+const uuid = require('react-native-uuid');
+
 export default function Login() {
   const [db, setDb] = useState();
   const [identity, setIdentity] = useState();
@@ -93,7 +95,7 @@ export default function Login() {
 
   const createUser = async () => {
       const ids = await db.create(threadId, 'User', [{
-        _id: '135',
+        _id: uuid.v1(),
         userAddress: '0x401aF064fcf5387ba77827DEcd0c26D16DBF9D8E',
         username,
         socialHandle,
@@ -104,7 +106,7 @@ export default function Login() {
       }]);
       console.log(ids)
       if (ids.length) {
-        addUserToCampaign();
+        // addUserToCampaign();
         setOpenPrompt(false);
         setCreatedUser(true);
       }
