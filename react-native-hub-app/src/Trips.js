@@ -76,10 +76,8 @@ export default function Trips(props) {
   }
 
   const addTrip = async () => {
-    console.log("here")
     const timestamps = tripData.route.features.map((trip) => trip.properties.timestamp);
     let completedTrip;
-    console.log('ahahahahah', threadRef.current)
     try {
       const completedTrip = await db.create(threadRef.current, 'Trip', [{
         _id: uuid.v1(),
@@ -88,7 +86,6 @@ export default function Trips(props) {
         coordinates,
         timestamps,
       }]);
-      console.log(completedTrip);
       showAd();
     } catch(err) {
       console.log(err.message)
@@ -114,7 +111,6 @@ export default function Trips(props) {
     const web3 = await getWeb3();
     const mobilityInstance = await getAdContract(web3);
     const rewards = await getRewards(web3, mobilityInstance);
-    // if (rewards) setRewardInfo(true);
     const newBalance = await web3.eth.getBalance('0x401aF064fcf5387ba77827DEcd0c26D16DBF9D8E');
     const balance = web3.utils.fromWei(newBalance, 'ether');
     setRewardInfo(balance);

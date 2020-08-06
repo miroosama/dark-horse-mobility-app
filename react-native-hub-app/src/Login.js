@@ -70,15 +70,7 @@ export default function Login() {
         setCreatedUser(true);
       } else {
         const cachedThreadId = ThreadID.fromString(USER_THREAD_ID);
-        // const cachedThreadId = ThreadID.fromRandom();
-
         await cacheUserThread(cachedThreadId);
-        console.log(cachedThreadId.toString())
-        // await userDb.newDB(cachedThreadId);
-        // use same collection
-        // await userDb.newCollection(cachedThreadId, 'User', userSchema);
-
-        // userDb.context.withThread(cachedThreadId.toString());
         setDb(userDb);
         setIdentity(identity);
         setThreadId(cachedThreadId);
@@ -106,7 +98,7 @@ export default function Login() {
       }]);
       console.log(ids)
       if (ids.length) {
-        // addUserToCampaign();
+        addUserToCampaign();
         setOpenPrompt(false);
         setCreatedUser(true);
       }

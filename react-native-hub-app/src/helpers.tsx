@@ -2,9 +2,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { ThreadID } from '@textile/hub'
 import { Libp2pCryptoIdentity } from '@textile/threads-core'
 
-const versionId = 10000 //Math.floor(Math.random() * 1000);
-const version = 10241 //Math.floor(Math.random() * 1000);
-const versionTrip = 10200 //Math.floor(Math.random() * 1000);
+const versionId = 10000
+const version = 10241
+const versionTrip = 10200
 const IDENTITY_KEY = 'identity-' + versionId
 const USER_THREAD_ID_V = 'user-thread-' + version
 const TRIP_THREAD_ID_V = 'trip-thread-' + versionTrip
@@ -34,7 +34,6 @@ export const getCachedUserThread = async (): Promise<ThreadID | undefined> => {
    * If the identity changes and you try to use an old database,
    * it will error due to not authorized.
    */
-   console.log(USER_THREAD_ID_V)
   const idStr = await AsyncStorage.getItem(USER_THREAD_ID_V)
   // Every user adds their info to same user thread
   console.log(idStr)

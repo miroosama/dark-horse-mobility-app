@@ -61,8 +61,7 @@ export async function getActiveCampaignIds(mobilityInstance) {
 }
 
 export async function getAd(mobilityInstance, activeCampaignIds) {
-  // const id = sample(activeCampaignIds);
-  const id = activeCampaignIds[activeCampaignIds.length - 1];
+  const id = sample(activeCampaignIds);
   const data = await mobilityInstance.methods.getActiveCampaignUsers(id).call({ from: USER_DEMO_ETH_ADR });
   const fileData = await fleekStorage.getFileFromHash({ hash: data.ipfsHash });
   return {
@@ -107,7 +106,6 @@ export async function getRewards(web3, mobilityInstance) {
   .then((signedTx) => {
     const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
     sentTx.on("receipt", receipt => {
-      console.log(receipt)
       return receipt
       });
       sentTx.on("error", err => {
